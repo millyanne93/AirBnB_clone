@@ -1,0 +1,2 @@
+As part of the AirBnB project at Holberton School, the console represents the initial phase dedicated to fundamental higher-level programming concepts. The ultimate goal of the AirBnB project is to successfully deploy a server emulating the essential features of the AirBnB Website (HBnB). In this specific phase, the focus is on creating a command interpreter to effectively manage objects for the AirBnB website.
+
