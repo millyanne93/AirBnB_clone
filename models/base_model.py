@@ -3,10 +3,9 @@
 This module defines all common attributes/methods for other classes
 """
 
-import models
 from datetime import datetime
 import uuid
-
+from models import storage
 
 class BaseModel:
     """Base class for all other classes"""
@@ -16,7 +15,7 @@ class BaseModel:
         if not kwargs:
             self.id = str(uuid.uuid4())
             self.created_at = self.updated_at = datetime.utcnow()
-            models.storage.new(self)
+            storage.new(self)
             return
 
         for key, val in kwargs.items():
@@ -43,7 +42,7 @@ class BaseModel:
     def save(self):
         """Updates when the attribute was last updated"""
         self.updated_at = datetime.now()
-        models.storage.save()
+        storage.new(self)
 
     def to_dict(self):
         """returns a dictionary representation of self"""
