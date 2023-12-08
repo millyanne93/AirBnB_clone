@@ -42,7 +42,7 @@ class BaseModel:
     def save(self):
         """Updates when the attribute was last updated"""
         self.updated_at = datetime.now()
-        storage.new(self)
+        storage.save()
 
     def to_dict(self):
         """returns a dictionary representation of self"""
