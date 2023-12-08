@@ -34,7 +34,7 @@ class FileStorage:
         new_dict = {}
         for key, value in self.__objects.items():
             new_dict[key] = value.to_dict()
-        with open(FileStorage.__file_path, mode="w", encoding="UTF-8") as to_file:
+        with open(self.__file_path, mode="w", encoding="UTF-8") as to_file:
             json.dump(new_dict, to_file)
 
     def reload(self):
@@ -49,8 +49,7 @@ class FileStorage:
                     class_name, obj_id = key.split('.')
                     if class_name in model_classes:
                         self.__objects[key] = model_classes[class_name](**val)
-        except (FileNotFoundError, json.JSONDecodeError):
-            # No need for error handling
+        except (FileNotFoundError):
             pass
 
     def class_dict(self):
@@ -73,26 +72,33 @@ class FileStorage:
             "Review": Review
         }
         return class_dict
+    def classes(self):
+        """Return the list of available model classes."""
+        return self.models
+
+    def attributes(self):
+        """Return a dictionary of attributes for each model class."""
+        return self.class_dict()
 
     def find_by_id(self, model, obj_id):
         """Find and return an element of model by its id"""
         if model not in self.models:
-            raise ModelNotFoundError(model)
+            raise NameError(model)
 
         key = f"{model}.{obj_id}"
         if key not in self.__objects:
-            raise InstanceNotFoundError(obj_id, model)
+            raise NameError(obj_id, model)
 
         return self.__objects[key]
 
     def delete_by_id(self, model, obj_id):
         """Delete an element of model by its id"""
         if model not in self.models:
-            raise ModelNotFoundError(model)
+            raise NameError(model)
 
         key = f"{model}.{obj_id}"
         if key not in self.__objects:
-            raise InstanceNotFoundError(obj_id, model)
+            raise NameError(obj_id, model)
 
         del self.__objects[key]
         self.save()
@@ -100,19 +106,19 @@ class FileStorage:
     def find_all(self, model=""):
         """Find all instances or instances of model"""
         if model and model not in self.models:
-            raise ModelNotFoundError(model)
+            raise NameError(model)
 
-        results = [str(val) for key, val in self.__objects.items() if key.startswith(model)]
+        results = [val for key, val in self.__objects.items() if key.startswith(model)]
         return results
 
     def update_one(self, model, obj_id, field, value):
         """Updates an instance"""
         if model not in self.models:
-            raise ModelNotFoundError(model)
+            raise NameError(model)
 
         key = f"{model}.{obj_id}"
         if key not in self.__objects:
-            raise InstanceNotFoundError(obj_id, model)
+            raise NameError(obj_id, model)
 
         instance = self.__objects[key]
         if field not in ("id", "updated_at", "created_at"):
