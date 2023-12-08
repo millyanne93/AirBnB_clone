@@ -158,8 +158,9 @@ class HBNBCommand(cmd.Cmd):
                 arg = arg[:-2]  # Remove the trailing '()'
             class_name, method_name = arg.split('.')
             cls = getattr(storage.models, class_name)
-            if hasattr(cls, method_name) and
-            callable(getattr(cls, method_name)):
+            if (hasattr(cls, method_name) and
+                callable(getattr(cls, method_name))):
+
                 method = getattr(cls, method_name)
                 result = method()
                 print(result)
