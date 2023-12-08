@@ -91,7 +91,7 @@ class HBNBCommand(cmd.Cmd):
             try:
                 instances = storage.find_all(class_name)
                 print([str(instance) for instance in instances])
-            except storage.ModelNotFoundError:
+            except NameError:
                 print("** class doesn't exist **")
         else:
             args = arg.split()
@@ -132,20 +132,18 @@ class HBNBCommand(cmd.Cmd):
                 else:
                     print("** no instance found **")
             except (NameError, SyntaxError):
-                print(f"** no instance found **")
+                print("** no instance found **")
 
-    # Count command
     def do_count(self, arg):
-        """Counts the number of instances of a class"""
-        args = arg.split()
-        if not args or not args[0]:
-            print("** class name missing **")
+        """Counts the instances of a specified class"""
+        class_name = arg.split()[0] if arg else None
+
+        if class_name and class_name in ["BaseModel", "Place", "State", "City",
+                                         "Amenity", "Review", "User"]:
+            instances = storage.find_all(class_name)
+            print(len(instances))
         else:
-            try:
-                instances = storage.find_all(args[0])
-                print(len(instances))
-            except (NameError):
-                print("** class doesn't exist **")
+            print("** class doesn't exist **")
 
     def do_models(self, arg):
         """Print all registered Models"""
@@ -155,48 +153,59 @@ class HBNBCommand(cmd.Cmd):
         """Handle Class Methods <cls>.all(), <cls>.show() etc"""
         try:
             if arg.endswith('()'):
-                arg = arg[:-2]  # Remove the trailing '()'
+                arg = arg[:-2]
             class_name, method_name = arg.split('.')
             cls = getattr(storage.models, class_name)
             if (hasattr(cls, method_name) and
-                callable(getattr(cls, method_name))):
-
+                    callable(getattr(cls, method_name))):
                 method = getattr(cls, method_name)
                 result = method()
-                print(result)
+                if result is not None:
+                    print(result)
             else:
                 print("** invalid method **")
         except AttributeError:
             print("** invalid method **")
-        except (NameError):
+        except NameError:
             print("** no instance found **")
         except TypeError as te:
             field = te.args[0].split()[-1].replace("_", " ")
             field = field.strip("'")
             print(f"** {field} missing **")
         except Exception as e:
-            print("** invalid syntax **")
+            print(f"** {e} **")
 
-    def default(self, arg):
-        """Override default method to handle class methods"""
-        class_method_pattern = r"^(\w+)\.(\w+)\(\)$"
-        match = re.match(class_method_pattern, arg)
+    def default(self, line):
+        if line is None:
+            return
 
-        if match:
-            class_name = match.group(1)
-            method_name = match.group(2)
+        cmdPattern = r"^([A-Za-z]+)\.([a-z]+)\(([^()]*)\)"
+        paramsPattern = (r'^"([^"]+)"(?:,\s*(?:"([^"]+)"|(\{[^}]+\}))(?:,\s*'
+                         r'(?:("?[^"]+"?)))?)?')
+        m = re.match(cmdPattern, line)
 
-            if class_name not in ["BaseModel", "Place", "State",
-                                  "City", "Amenity", "Review", "User"]:
-                print("** class doesn't exist **")
-                return
+        if not m:
+            super().default(line)
+            return
 
-            if method_name == 'count':
-                self.do_count(class_name)
-            else:
-                print("** invalid method **")
+        mName, method, params = m.groups()
+        m = re.match(paramsPattern, params)
+        params = [item for item in m.groups() if item] if m else []
+
+        cmd = " ".join([mName] + params)
+
+        method_functions = {
+            'all': self.do_all,
+            'count': self.do_count,
+            'show': self.do_show,
+            'destroy': self.do_destroy,
+            'update': self.do_update,
+        }
+
+        if method in method_functions:
+            return method_functions[method](cmd)
         else:
-            return cmd.Cmd.default(self, arg)
+            super().default(line)
 
 
 if __name__ == '__main__':
