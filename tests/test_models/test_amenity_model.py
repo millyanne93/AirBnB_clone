@@ -1,80 +1,63 @@
 #!/usr/bin/python3
+"""Unittest module for the Amenity Class."""
 
 import unittest
 import os
-
+from datetime import datetime
 from models.amenity import Amenity
+from models.engine.file_storage import FileStorage
 from models.base_model import BaseModel
 
 
 class TestAmenity(unittest.TestCase):
-    """
-    Test cases for the Amenity class in the models module.
-    """
+    """Test Cases for the Amenity class."""
 
-    @classmethod
-    def setUpClass(cls):
-        """
-        Set up the test environment and create an instance of Amenity for testing.
+    def setUp(self):
+        """sets up tests"""
+        self.amenity = Amenity()
 
-        """
-        cls.amenity1 = Amenity()
-        cls.amenity1.name = "Swimming Pool"
+    def tearDown(self):
+        """Tears down test methods."""
+        self.resetStorage()
+        pass
 
-    @classmethod
-    def tearDownClass(cls):
-        """
-        Clean up the test environment after all test methods have been run.
+    def resetStorage(self):
+        """Resets FileStorage data."""
+        FileStorage._FileStorage__objects = {}
+        if os.path.isfile(FileStorage._FileStorage__file_path):
+            os.remove(FileStorage._FileStorage__file_path)
 
-        """
-        del cls.amenity1
-        try:
-            os.remove("file.json")
-        except FileNotFoundError:
-            pass
+    def test_amenity_inherits_from_base_model(self):
+        """tests inheritance"""
+        self.assertIsInstance(self.amenity, BaseModel)
 
+    def test_amenity_attributes(self):
+        """test attr for amenity"""
+        self.assertTrue(hasattr(self.amenity, 'name'))
 
+    def test_amenity_attributes_default_values(self):
+        """test attr default values"""
+        self.assertEqual(self.amenity.name, "")
 
-    def test_is_subclass(self):
-        """
-        Test if Amenity is a subclass of BaseModel.
-        """
-        self.assertTrue(issubclass(self.amenity1.__class__, BaseModel), True)
+    def test_amenity_attributes_assignment(self):
+        """test attr assignment"""
+        self.amenity.name = "WiFi"
+        self.assertEqual(self.amenity.name, "WiFi")
 
-    def test_checking_for_functions(self):
-        """
-        Test the existance of a docstring for the Amenity class.
-        """
-        self.assertIsNotNone(Amenity.__doc__)
+    def test_amenity_to_dict_method(self):
+        """test to dict method"""
+        amenity_dict = self.amenity.to_dict()
+        self.assertIsInstance(amenity_dict, dict)
+        self.assertIn('id', amenity_dict)
+        self.assertIn('created_at', amenity_dict)
+        self.assertIn('updated_at', amenity_dict)
+        self.assertIn('name', amenity_dict)
 
-    def test_has_attributes(self):
-        """
-        Test if the Amenity instance has the expected attributes.
-        """
-        self.assertTrue('id' in self.amenity1.__dict__)
-        self.assertTrue('created_at' in self.amenity1.__dict__)
-        self.assertTrue('updated_at' in self.amenity1.__dict__)
-        self.assertTrue('name' in self.amenity1.__dict__)
-
-    def test_attributes_are_strings(self):
-        """
-        Test if the name attribute is a string.
-        """
-        self.assertEqual(type(self.amenity1.name), str)
-
-    def test_save(self):
-        """
-        Test the save method of the Amenity class.
-        """
-        self.amenity1.save()
-        self.assertNotEqual(self.amenity1.created_at, self.amenity1.updated_at)
-
-    def test_to_dict(self):
-        """
-        Test the existance of the 'to_dict' method in the Amenity class.
-        """
-        self.assertEqual('to_dict' in dir(self.amenity1), True)
+    def test_amenity_str_representation(self):
+        """test str representation"""
+        self.assertEqual(str(self.amenity), "[Amenity] ({}) {}".format(
+            self.amenity.id, self.amenity.__dict__))
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()
