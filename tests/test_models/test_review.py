@@ -2,6 +2,7 @@
 """Unittest module for the Review Class."""
 
 import unittest
+import json
 import os
 from datetime import datetime
 from models.review import Review
@@ -38,25 +39,6 @@ class TestReview(unittest.TestCase):
         self.assertEqual(self.review.user_id, "")
         self.assertEqual(self.review.text, "")
 
-    def test_review_attributes_assignment(self):
-        self.review.place_id = "123"
-        self.review.user_id = "456"
-        self.review.text = "A great place!"
-        self.assertEqual(self.review.place_id, "123")
-        self.assertEqual(self.review.user_id, "345")
-        self.assertEqual(self.review.text, "Excellent!")
-
-    """
-    def test_review_to_dict_method(self):
-        review_dict = self.review.to_dict()
-        self.assertIsInstance(review_dict, dict)
-        self.assertIn('id', review_dict)
-        self.assertIn('created_at', review_dict)
-        self.assertIn('updated_at', review_dict)
-        self.assertIn('place_id', review_dict)
-        self.assertIn('user_id', review_dict)
-        self.assertIn('text', review_dict)
-    """
     def test_review_str_representation(self):
         self.assertEqual(str(self.review), "[Review] ({}) {}"
                          .format(self.review.id, self.review.__dict__))

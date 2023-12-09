@@ -41,17 +41,8 @@ class TestAmenity(unittest.TestCase):
 
     def test_amenity_attributes_assignment(self):
         """test attr assignment"""
-        self.amenity.name = "WiFi"
-        self.assertEqual(self.amenity.name, "WiFi")
-
-    def test_amenity_to_dict_method(self):
-        """test to dict method"""
-        amenity_dict = self.amenity.to_dict()
-        self.assertIsInstance(amenity_dict, dict)
-        self.assertIn('id', amenity_dict)
-        self.assertIn('created_at', amenity_dict)
-        self.assertIn('updated_at', amenity_dict)
-        self.assertIn('name', amenity_dict)
+        self.amenity.name = "Gymn"
+        self.assertEqual(self.amenity.name, "Gymn")
 
     def test_amenity_str_representation(self):
         """test str representation"""

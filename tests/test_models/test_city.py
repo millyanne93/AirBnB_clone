@@ -37,12 +37,12 @@ class TestCity(unittest.TestCase):
         self.assertTrue(hasattr(self.city, 'name'))
 
     def test_city_attributes_default_values(self):
-        """test city diffualt attributes"""
+        """Test for defaultattributes"""
         self.assertEqual(self.city.state_id, "")
         self.assertEqual(self.city.name, "")
 
     def test_city_attributes_assignment(self):
-        """test city attr assignment"""
+        """Test for city attr assignment"""
         self.city.state_id = "NY"
         self.city.name = "New York"
         self.assertEqual(self.city.state_id, "NY")
