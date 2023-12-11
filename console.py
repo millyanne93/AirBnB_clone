@@ -41,14 +41,16 @@ class HBNBCommand(cmd.Cmd):
             print("** class name missing **")
         else:
             class_name = arg.split()[0]
-            if class_name not in ["BaseModel", "Place", "State",
-                                  "City", "Amenity", "Review", "User"]:
+            classes = storage.classes()
+
+            if class_name not in classes:
                 print("** class doesn't exist **")
             else:
-                class_instance = storage.models.get(class_name)
+                class_instance = classes[class_name]
                 if class_instance:
                     new_instance = class_instance()
-                    new_instance.save()
+                    storage.new(new_instance)
+                    storage.save()
                     print(new_instance.id)
                 else:
                     print("** class doesn't exist **")
@@ -142,16 +144,11 @@ class HBNBCommand(cmd.Cmd):
         """Counts the instances of a specified class"""
         class_name = arg.split()[0] if arg else None
 
-        if class_name and class_name in ["BaseModel", "Place", "State", "City",
-                                         "Amenity", "Review", "User"]:
+        if class_name and class_name in storage.classes():
             instances = storage.find_all(class_name)
             print(len(instances))
         else:
-            print("** class doesn't exist **")
-
-    def do_models(self, arg):
-        """Print all registered Models"""
-        print(*storage.models)
+            print("** class doesn't exist**")
 
     def handle_class_methods(self, arg):
         """Handle Class Methods <cls>.all(), <cls>.show() etc"""
@@ -159,7 +156,7 @@ class HBNBCommand(cmd.Cmd):
             if arg.endswith('()'):
                 arg = arg[:-2]
             class_name, method_name = arg.split('.')
-            cls = getattr(storage.models, class_name)
+            cls = getattr(storage.classes, class_name)
             if (hasattr(cls, method_name) and
                     callable(getattr(cls, method_name))):
                 method = getattr(cls, method_name)
