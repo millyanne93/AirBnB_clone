@@ -30,12 +30,10 @@ class FileStorage:
         FileStorage.__objects[key] = obj
 
     def save(self):
-        """Serializes objects to JSON storage file"""
-        new_dict = {}
-        for key, value in self.__objects.items():
-            new_dict[key] = value.to_dict()
-        with open(self.__file_path, mode="w", encoding="UTF-8") as to_file:
-            json.dump(new_dict, to_file)
+        """ serializes __objects to the JSON file (path: __file_path)"""
+        with open(FileStorage.__file_path, "w", encoding="utf-8") as f:
+            d = {k: v.to_dict() for k, v in FileStorage.__objects.items()}
+            json.dump(d, f)
 
     def reload(self):
         """This deserializes the JSON file to objects if the file exists"""
@@ -125,5 +123,11 @@ class FileStorage:
         instance = self.__objects[key]
         if field not in ("id", "updated_at", "created_at"):
             setattr(instance, field, type(getattr(instance, field))(value))
-            instance.updated_at = datetime.utcnow()
+
+            # Only update updated_at if the field is not 'updated_at'
+            if field != 'updated_at':
+                instance.updated_at = datetime.utcnow()
+
+            # Save the instance separately after updating the attributes
+            self.__objects[key] = instance
             self.save()
