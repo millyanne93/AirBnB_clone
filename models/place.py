@@ -1,11 +1,17 @@
-#!/usr/bin/python3
-"""This module creates a Place class"""
+#!usr/bin/python3
+"""
+This module deals with attributes and methods of the
+class Place.
 
+"""
 from models.base_model import BaseModel
 
 
 class Place(BaseModel):
-    """Class for managing place objects"""
+    """
+    Class that contains the Place information
+
+    """
 
     city_id = ""
     user_id = ""
@@ -18,3 +24,11 @@ class Place(BaseModel):
     latitude = 0.0
     longitude = 0.0
     amenity_ids = []
+
+    def __init__(self, *args, **kwargs):
+        """
+        Initializes a Place object.
+
+        """
+
+        super().__init__(*args, **kwargs)
