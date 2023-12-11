@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 """
-This module deals with unittests for the command line
-interface that runs our HBNB application.
+This module deals with unittests for the console.
 
 """
 from unittest import TestCase
@@ -22,11 +21,15 @@ class TestConsoleCreate(unittest.TestCase):
 
     def test_quit(self):
         # Check if quit command exits the program
-        self.assertTrue(self.console.do_quit(''))
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.assertTrue(self.console.do_quit(''))
+            self.assertEqual(f.getvalue().strip(), '')
 
     def test_EOF(self):
         # Check if EOF command exits the program
-        self.assertTrue(self.console.do_EOF(''))
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.assertTrue(self.console.do_EOF(''))
+            self.assertEqual(f.getvalue().strip(), '')
 
     def test_emptyline(self):
         # Check if emptyline method does not produce any output
