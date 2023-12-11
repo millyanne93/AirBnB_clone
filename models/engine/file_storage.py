@@ -26,6 +26,12 @@ class FileStorage:
             d = {k: v.to_dict() for k, v in FileStorage.__objects.items()}
             json.dump(d, f)
 
+    def find_all(self, cls_name=""):
+        """Find all instances of a class"""
+        if cls_name:
+            return [obj for key, obj in self.__objects.items() if cls_name in key]
+        return list(self.__objects.values())
+
     def classes(self):
         """Returns a dictionary of classes and their references"""
         from models.base_model import BaseModel
