@@ -16,15 +16,7 @@ from models.review import Review
 from models.user import User
 
 
-storage.models = {
-    "BaseModel": BaseModel,
-    "Place": Place,
-    "State": State,
-    "City": City,
-    "Amenity": Amenity,
-    "Review": Review,
-    "User": User
-}
+storage.models = classes
 
 
 class HBNBCommand(cmd.Cmd):
