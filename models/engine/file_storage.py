@@ -26,12 +26,6 @@ class FileStorage:
             d = {k: v.to_dict() for k, v in FileStorage.__objects.items()}
             json.dump(d, f)
 
-    def find_all(self, cls_name=""):
-        """Find all instances of a class"""
-        if cls_name:
-            return [obj for key, obj in self.__objects.items() if cls_name in key]
-        return list(self.__objects.values())
-
     def classes(self):
         """Returns a dictionary of classes and their references"""
         from models.base_model import BaseModel
@@ -67,3 +61,57 @@ class FileStorage:
                         self.__objects[key] = model_classes[class_name](**val)
         except (FileNotFoundError):
             pass
+
+    def find_all(self, model=""):
+        """Find all instances of a specific model"""
+        instances = self.__objects.values()
+
+        if model:
+            if model in self.classes():
+                instances = [obj for obj in instances
+                             if isinstance(obj, self.classes()[model])]
+            else:
+                raise NameError(f"** class '{model}' doesn't exist **")
+
+        return list(instances)
+
+    def find_by_id(self, model, obj_id):
+        """Find and return an element of model by its id"""
+        classes = self.classes()
+        if model not in classes:
+            raise NameError(model)
+
+        key = f"{model}.{obj_id}"
+        if key not in self.__objects:
+            raise NameError(obj_id, model)
+
+        return self.__objects[key]
+
+    def delete_by_id(self, model, obj_id):
+        """Delete an element of model by its id"""
+        classes = self.classes()
+        if model not in classes:
+            raise NameError(model)
+
+        key = f"{model}.{obj_id}"
+        if key not in self.__objects:
+            raise NameError(obj_id, model)
+
+        del self.__objects[key]
+        self.save()
+
+    def update_one(self, model, obj_id, field, value):
+        """Updates an instance"""
+        if model not in self.models:
+            raise NameError(model)
+
+        key = f"{model}.{obj_id}"
+        if key not in self.__objects:
+            raise NameError(obj_id, model)
+
+        instance = self.__objects[key]
+        if field not in ("id", "updated_at", "created_at"):
+            setattr(instance, field,
+                    type(getattr(instance, field))(value))
+            instance.updated_at = datetime.utcnow()
+            self.save()
