@@ -49,7 +49,7 @@ class BaseModel:
         """Returns a dictionary representation of self"""
         i_dict = self.__dict__.copy()
         i_dict["__class__"] = type(self).__name__
+        i_dict["name"] = getattr(self, "name", "")
         i_dict["created_at"] = self.created_at.isoformat()
         i_dict["updated_at"] = self.updated_at.isoformat()
-        i_dict["name"] = getattr(self, "name", "")
         return i_dict
