@@ -12,6 +12,8 @@ class Place(BaseModel):
     Class that contains the Place information
 
     """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     city_id = ""
     user_id = ""
@@ -24,11 +26,3 @@ class Place(BaseModel):
     latitude = 0.0
     longitude = 0.0
     amenity_ids = []
-
-    def __init__(self, *args, **kwargs):
-        """
-        Initializes a Place object.
-
-        """
-
-        super().__init__(*args, **kwargs)
