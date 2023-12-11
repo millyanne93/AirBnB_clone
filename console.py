@@ -16,9 +16,6 @@ from models.review import Review
 from models.user import User
 
 
-storage.models = classes
-
-
 class HBNBCommand(cmd.Cmd):
     prompt = '(hbnb) '
 
@@ -48,9 +45,13 @@ class HBNBCommand(cmd.Cmd):
                                   "City", "Amenity", "Review", "User"]:
                 print("** class doesn't exist **")
             else:
-                new_instance = getattr(storage.models, class_name)()
-                new_instance.save()
-                print(new_instance.id)
+                class_instance = storage.models.get(class_name)
+                if class_instance:
+                    new_instance = class_instance()
+                    new_instance.save()
+                    print(new_instance.id)
+                else:
+                    print("** class doesn't exist **")
 
     # Show command
     def do_show(self, arg):
