@@ -72,6 +72,7 @@ class FileStorage:
             "Review": Review
         }
         return class_dict
+
     def classes(self):
         """Return the list of available model classes."""
         return self.models
@@ -108,7 +109,8 @@ class FileStorage:
         if model and model not in self.models:
             raise NameError(model)
 
-        results = [val for key, val in self.__objects.items() if key.startswith(model)]
+        results = [val for key, val in self.__objects.items()
+                   if key.startswith(model)]
         return results
 
     def update_one(self, model, obj_id, field, value):
