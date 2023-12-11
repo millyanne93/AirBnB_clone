@@ -10,15 +10,6 @@ class FileStorage:
 
     __file_path = "file.json"
     __objects = {}
-    models = (
-        "BaseModel",
-        "User", "City", "State", "Place",
-        "Amenity", "Review"
-    )
-
-    def __init__(self):
-        """Constructor"""
-        pass
 
     def all(self):
         """This returns the objects dictionary"""
@@ -35,22 +26,7 @@ class FileStorage:
             d = {k: v.to_dict() for k, v in FileStorage.__objects.items()}
             json.dump(d, f)
 
-    def reload(self):
-        """This deserializes the JSON file to objects if the file exists"""
-        try:
-            with open(FileStorage.__file_path, 'r') as file:
-                data = json.load(file)
-
-                model_classes = self.class_dict()
-
-                for key, val in data.items():
-                    class_name, obj_id = key.split('.')
-                    if class_name in model_classes:
-                        self.__objects[key] = model_classes[class_name](**val)
-        except (FileNotFoundError):
-            pass
-
-    def class_dict(self):
+    def classes(self):
         """Returns a dictionary of classes and their references"""
         from models.base_model import BaseModel
         from models.user import User
@@ -60,7 +36,7 @@ class FileStorage:
         from models.place import Place
         from models.review import Review
 
-        class_dict = {
+        classes = {
             "BaseModel": BaseModel,
             "User": User,
             "State": State,
@@ -69,65 +45,19 @@ class FileStorage:
             "Place": Place,
             "Review": Review
         }
-        return class_dict
+        return classes
 
-    def classes(self):
-        """Return the list of available model classes."""
-        return self.models
+    def reload(self):
+        """This deserializes the JSON file to objects if the file exists"""
+        try:
+            with open(FileStorage.__file_path, 'r') as file:
+                data = json.load(file)
 
-    def attributes(self):
-        """Return a dictionary of attributes for each model class."""
-        return self.class_dict()
+                model_classes = self.classes()
 
-    def find_by_id(self, model, obj_id):
-        """Find and return an element of model by its id"""
-        if model not in self.models:
-            raise NameError(model)
-
-        key = f"{model}.{obj_id}"
-        if key not in self.__objects:
-            raise NameError(obj_id, model)
-
-        return self.__objects[key]
-
-    def delete_by_id(self, model, obj_id):
-        """Delete an element of model by its id"""
-        if model not in self.models:
-            raise NameError(model)
-
-        key = f"{model}.{obj_id}"
-        if key not in self.__objects:
-            raise NameError(obj_id, model)
-
-        del self.__objects[key]
-        self.save()
-
-    def find_all(self, model=""):
-        """Find all instances or instances of model"""
-        if model and model not in self.models:
-            raise NameError(model)
-
-        results = [val for key, val in self.__objects.items()
-                   if key.startswith(model)]
-        return results
-
-    def update_one(self, model, obj_id, field, value):
-        """Updates an instance"""
-        if model not in self.models:
-            raise NameError(model)
-
-        key = f"{model}.{obj_id}"
-        if key not in self.__objects:
-            raise NameError(obj_id, model)
-
-        instance = self.__objects[key]
-        if field not in ("id", "updated_at", "created_at"):
-            setattr(instance, field, type(getattr(instance, field))(value))
-
-            # Only update updated_at if the field is not 'updated_at'
-            if field != 'updated_at':
-                instance.updated_at = datetime.utcnow()
-
-            # Save the instance separately after updating the attributes
-            self.__objects[key] = instance
-            self.save()
+                for key, val in data.items():
+                    class_name, obj_id = key.split('.')
+                    if class_name in model_classes:
+                        self.__objects[key] = model_classes[class_name](**val)
+        except (FileNotFoundError):
+            pass
