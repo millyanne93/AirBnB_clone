@@ -17,6 +17,7 @@ from models.user import User
 
 
 class HBNBCommand(cmd.Cmd):
+    """The prompt"""
     prompt = '(hbnb) '
 
     # Exit commands
@@ -69,9 +70,12 @@ class HBNBCommand(cmd.Cmd):
         else:
             try:
                 instance = storage.find_by_id(args[0], args[1])
-                print(instance)
-            except (NameError, SyntaxError):
-                print("** no instance found **")
+                if instance:
+                    print(instance)
+                else:
+                    print("** no instance found **")
+            except NameError as ne:
+                print(f"** class doesn't exist **: {ne}")
 
     # Destroy command
     def do_destroy(self, arg):
@@ -84,8 +88,8 @@ class HBNBCommand(cmd.Cmd):
         else:
             try:
                 storage.delete_by_id(args[0], args[1])
-            except (NameError, SyntaxError):
-                print("** no instance found **")
+            except NameError as ne:
+                print(f"** class doesn't exist **: {ne}")
 
     # All command
     def do_all(self, arg):
@@ -136,7 +140,10 @@ class HBNBCommand(cmd.Cmd):
                     setattr(instance, attribute_name, attribute_value)
                     instance.save()
                 else:
-                    print("** no instance found **")
+                    if class_name in storage.classes():
+                        print("** no instance found **")
+                    else:
+                        print("** class doesn't exist **")
             except (NameError, SyntaxError):
                 print("** no instance found **")
 
