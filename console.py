@@ -58,29 +58,27 @@ class HBNBCommand(cmd.Cmd):
     # Show command
     def do_show(self, arg):
         """
-        Prints the string representation of an instance.
-
+        Prints the string representation of an
+        instance based on the class name and id.
         """
         args = arg.split()
         if not args:
             print("** class name missing **")
         elif len(args) < 2:
             print("** instance id missing **")
+        else:
+            class_name, instance_id = args[0], args[1]
 
-        class_name, instance_id = args[0], args[1]
+            if class_name not in storage.classes():
+                print("** class doesn't exist **")
+            else:
+                key = "{}.{}".format(class_name, instance_id)
+                instance = storage.all().get(key)
 
-        if class_name not in storage.classes():
-            print("** class doesn't exist **")
-            return
-
-        key = "{}.{}".format(class_name, instance_id)
-        instance = storage.all().get(key)
-
-        if instance is None:
-            print("** no instance found **")
-            return
-
-        print(instance)
+                if instance is None:
+                    print("** no instance found **")
+                else:
+                    print(instance)
 
     # Destroy command
     def do_destroy(self, arg):
@@ -91,10 +89,19 @@ class HBNBCommand(cmd.Cmd):
         elif len(args) < 2:
             print("** instance id missing **")
         else:
-            try:
-                storage.delete_by_id(args[0], args[1])
-            except (NameError, SyntaxError):
-                print("** no instance found **")
+            class_name, instance_id = args[0], args[1]
+
+            if class_name not in storage.classes():
+                print("** class doesn't exist **")
+            else:
+                key = "{}.{}".format(class_name, instance_id)
+                if key not in storage.all():
+                    print("** no instance found **")
+                else:
+                    try:
+                        storage.delete_by_id(class_name, instance_id)
+                    except (NameError, SyntaxError):
+                        print("** no instance found **")
 
     # All command
     def do_all(self, arg):
@@ -143,15 +150,23 @@ class HBNBCommand(cmd.Cmd):
                 print("** class doesn't exist **")
                 return
 
-            try:
-                instance = storage.find_by_id(class_name, instance_id)
-                if instance:
-                    setattr(instance, attribute_name, attribute_value)
-                    instance.save()
-                else:
-                    print("** no instance found **")
-            except (NameError, SyntaxError):
+            key = "{}.{}".format(class_name, instance_id)
+            if key not in storage.all():
                 print("** no instance found **")
+                return
+
+            instance = storage.find_by_id(class_name, instance_id)
+            if not hasattr(instance, attribute_name):
+                print("** attribute name missing **")
+                return
+
+            try:
+                # Assume the attribute value is valid for its type
+                # (casting is not needed for string, integer, and float)
+                setattr(instance, attribute_name, eval(attribute_value))
+                instance.save()
+            except (NameError, SyntaxError):
+                print("** class doesn't exist **")
 
     def do_count(self, arg):
         """Counts the instances of a specified class"""
