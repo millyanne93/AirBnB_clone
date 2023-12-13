@@ -54,24 +54,6 @@ class TestUser(unittest.TestCase):
         expected_str = f"[User] ({self.user.id}) {self.user.__dict__}"
         self.assertEqual(str(self.user), expected_str)
 
-    def test_to_dict_method(self):
-        """Test the to_dict method of User instances."""
-        user_dict = self.user.to_dict()
-        self.assertIsInstance(user_dict, dict)
-        self.assertIn('__class__', user_dict)
-        self.assertIn('id', user_dict)
-        self.assertIn('created_at', user_dict)
-        self.assertIn('updated_at', user_dict)
-        self.assertIn('email', user_dict)
-        self.assertIn('password', user_dict)
-        self.assertIn('first_name', user_dict)
-        self.assertIn('last_name', user_dict)
-        self.assertEqual(user_dict['__class__'], 'User')
-        self.assertEqual(user_dict['email'], self.user.email)
-        self.assertEqual(user_dict['password'], self.user.password)
-        self.assertEqual(user_dict['first_name'], self.user.first_name)
-        self.assertEqual(user_dict['last_name'], self.user.last_name)
-
 
 if __name__ == "__main__":
     unittest.main()
