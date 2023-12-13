@@ -48,19 +48,14 @@ class FileStorage:
         return classes
 
     def reload(self):
-        """This deserializes the JSON file to objects if the file exists"""
-        try:
-            with open(FileStorage.__file_path, 'r') as file:
-                data = json.load(file)
-
-                model_classes = self.classes()
-
-                for key, val in data.items():
-                    class_name, obj_id = key.split('.')
-                    if class_name in model_classes:
-                        self.__objects[key] = model_classes[class_name](**val)
-        except (FileNotFoundError):
-            pass
+        """Reloads the stored objects"""
+        if not os.path.isfile(FileStorage.__file_path):
+            return
+        with open(FileStorage.__file_path, "r", encoding="utf-8") as f:
+            obj_dict = json.load(f)
+            obj_dict = {k: self.classes()[v["__class__"]](**v)
+                        for k, v in obj_dict.items()}
+            FileStorage.__objects = obj_dict
 
     def find_all(self, model=""):
         """Find all instances of a specific model"""
@@ -102,7 +97,7 @@ class FileStorage:
 
     def update_one(self, model, obj_id, field, value):
         """Updates an instance"""
-        if model not in self.models:
+        if model not in self.classes():
             raise NameError(model)
 
         key = f"{model}.{obj_id}"
