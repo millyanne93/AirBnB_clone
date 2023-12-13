@@ -17,7 +17,6 @@ from models.user import User
 
 
 class HBNBCommand(cmd.Cmd):
-    """The prompt"""
     prompt = '(hbnb) '
 
     # Exit commands
@@ -59,23 +58,29 @@ class HBNBCommand(cmd.Cmd):
     # Show command
     def do_show(self, arg):
         """
-        Prints the string representation of
-        an instance based on the class name and id
+        Prints the string representation of an instance.
+
         """
         args = arg.split()
         if not args:
             print("** class name missing **")
         elif len(args) < 2:
             print("** instance id missing **")
-        else:
-            try:
-                instance = storage.find_by_id(args[0], args[1])
-                if instance:
-                    print(instance)
-                else:
-                    print("** no instance found **")
-            except NameError as ne:
-                print(f"** class doesn't exist **: {ne}")
+
+        class_name, instance_id = args[0], args[1]
+
+        if class_name not in storage.classes():
+            print("** class doesn't exist **")
+            return
+
+        key = "{}.{}".format(class_name, instance_id)
+        instance = storage.all().get(key)
+
+        if instance is None:
+            print("** no instance found **")
+            return
+
+        print(instance)
 
     # Destroy command
     def do_destroy(self, arg):
@@ -88,8 +93,8 @@ class HBNBCommand(cmd.Cmd):
         else:
             try:
                 storage.delete_by_id(args[0], args[1])
-            except NameError as ne:
-                print(f"** class doesn't exist **: {ne}")
+            except (NameError, SyntaxError):
+                print("** no instance found **")
 
     # All command
     def do_all(self, arg):
@@ -134,16 +139,17 @@ class HBNBCommand(cmd.Cmd):
             attribute_name = args[2]
             attribute_value = args[3]
 
+            if class_name not in storage.classes():
+                print("** class doesn't exist **")
+                return
+
             try:
                 instance = storage.find_by_id(class_name, instance_id)
                 if instance:
                     setattr(instance, attribute_name, attribute_value)
                     instance.save()
                 else:
-                    if class_name in storage.classes():
-                        print("** no instance found **")
-                    else:
-                        print("** class doesn't exist **")
+                    print("** no instance found **")
             except (NameError, SyntaxError):
                 print("** no instance found **")
 
