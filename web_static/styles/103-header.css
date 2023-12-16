@@ -1,0 +1,30 @@
+header {
+    background-color: white;
+    height: 70px;
+    width: 100%;
+    border-bottom: 1px solid #CCCCCC;
+    display: flex;
+    align-items: center;
+    color: #333; /* Adjust text color for better contrast */
+}
+
+.logo {
+    background-image: url(../images/logo.png);
+    width: 136px;
+    height: 60px;
+    position: absolute;
+    left: 20px;
+}
+
+/* Responsive design for smaller screens */
+@media only screen and (max-width: 768px) {
+    header {
+        height: 50px;
+    }
+
+    .logo {
+        width: 100px;
+        height: 40px;
+        left: 10px;
+    }
+}
